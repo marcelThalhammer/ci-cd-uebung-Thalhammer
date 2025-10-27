@@ -5,6 +5,10 @@ Dieses Repository ist der Startpunkt für **Übung 1** und wird in **allen folge
 
 ---
 
+## Übung 1
+- Autor: Marcel Thalhammer
+- Besonderheit:Habe bereits mit Git in Projekten gearbeitet und kenne die Grundlagen von Branches und Commits.
+
 ## Voraussetzungen (VS Code)
 - **Extension Pack for Java** (Language Support, Debugger, Test Runner, Maven).
 - **JDK 17** aktiv: *Java: Configure Java Runtime*.
