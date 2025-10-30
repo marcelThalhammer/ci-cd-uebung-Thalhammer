@@ -3,6 +3,8 @@ package com.example.cicd;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.beans.Transient;
+
 /**
  * Hinweis:
  * - Dieser Test wird voraussichtlich FAILEN, weil isPalindrome '==' nutzt.
@@ -24,4 +26,5 @@ class TextUtilsTest {
     void isPalindrome_caseInsensitive_expectedTrue() {
         assertTrue(TextUtils.isPalindrome("Anna"));
     }
+ 
 }

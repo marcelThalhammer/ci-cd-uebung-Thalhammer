@@ -33,4 +33,21 @@ class CalculatorTest {
         List<Integer> nums = Arrays.asList(1, 2, 3, null, 4);
         assertEquals(c.sumUp(nums), c.addAll(nums));
     }
+
+    @Test
+    void subtract_shouldSubtractTwoInteger() {
+        Calculator c = new Calculator();
+        
+        assertEquals(7, c.subtract(10, 3));
+        assertEquals(-2, c.subtract(5, 7)); 
+        assertEquals(0, c.subtract(5, 5));
+    }
+
+    @Test
+    void subtract_shouldWorkWithNegativeResult() {
+        Calculator c = new Calculator();
+        assertEquals(-2, c.subtract(3, 5));
+    }
+
+    
 }
