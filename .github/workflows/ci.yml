@@ -52,7 +52,7 @@ jobs:
         name: jacoco-report-${{ matrix.os }}-jdk${{ matrix.java }}
         path: target/site/jacoco/
 
-        - name: Run SonarCloud analysis
+    - name: Run SonarCloud analysis
       if: github.ref == 'refs/heads/main'   
       run: |
         mvn -q sonar:sonar \
