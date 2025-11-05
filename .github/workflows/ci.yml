@@ -1,3 +1,11 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
 jobs:
   test:
     name: Test (${{ matrix.os }}, JDK ${{ matrix.java }})
@@ -25,7 +33,7 @@ jobs:
       
     - name: Upload test reports
       uses: actions/upload-artifact@v4
-      if: always()  
+      if: always()
       with:
         name: surefire-reports-${{ matrix.os }}-jdk${{ matrix.java }}
         path: target/surefire-reports/
