@@ -30,7 +30,7 @@ jobs:
         
     - name: Run tests with Maven
       run: mvn -q test
-      continue-on-error: true   
+      continue-on-error: true
         
     - name: Upload test reports
       uses: actions/upload-artifact@v4
@@ -38,7 +38,13 @@ jobs:
       with:
         name: surefire-reports-${{ matrix.os }}-jdk${{ matrix.java }}
         path: target/surefire-reports/
-
+        
+    - name: Generate and upload coverage report
+      run: |
+        mvn -q jacoco:report
+        ls -la target/site/jacoco/
+      continue-on-error: true
+      
     - name: Upload coverage report
       uses: actions/upload-artifact@v4
       if: always()
