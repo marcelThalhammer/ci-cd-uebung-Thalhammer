@@ -1,0 +1,23 @@
+# Build outputs
+target/
+*.jar
+*.war
+*.ear
+
+# Version control
+.git/
+.github/
+
+# IDE files  
+*.iml
+.idea/
+.classpath
+.project
+.settings/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
