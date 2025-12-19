@@ -91,65 +91,65 @@ jobs:
         retention-days: 7
 
   security-scan:
-  name: Security Scan
-  runs-on: ubuntu-latest
-  needs: docker   
-  if: github.ref == 'refs/heads/main'
-  
-  steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+    name: Security Scan
+    runs-on: ubuntu-latest
+    needs: docker   
+    if: github.ref == 'refs/heads/main'
     
-    
-    - name: Download Docker image artifact
-      uses: actions/download-artifact@v4
-      with:
-        name: docker-image-${{ github.sha }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      
+      - name: Download Docker image artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: docker-image-${{ github.sha }}
+          
+      
+      - name: Debug - Check downloaded file
+        run: ls -la docker-image-${{ github.sha }}.tar || echo "File not found!"
         
-     
-    - name: Debug - Check downloaded file
-      run: ls -la docker-image-${{ github.sha }}.tar || echo "File not found!"
       
-     
-    - name: Load Docker image (optional for Trivy)
-      run: |
-        docker load -i docker-image-${{ github.sha }}.tar
-        docker images | grep ci-cd-app
+      - name: Load Docker image (optional for Trivy)
+        run: |
+          docker load -i docker-image-${{ github.sha }}.tar
+          docker images | grep ci-cd-app
 
-     
-    - name: Run Trivy vulnerability scan
-      run: |
-        docker run --rm \
-          -v /var/run/docker.sock:/var/run/docker.sock \
-          aquasec/trivy:latest \
-          image --format json \
-          ci-cd-app:${{ github.sha }} > trivy-scan.json
-      continue-on-error: true  
-
-    - name: Upload Trivy report
-      uses: actions/upload-artifact@v4
-      if: always()
-      with:
-        name: trivy-report-${{ github.sha }}
-        path: trivy-scan.json
-
-   
-    - name: Run Grype vulnerability scan
-      run: |
-        # Stelle sicher, dass wir im richtigen Verzeichnis sind und der Pfad stimmt
-        echo "Current directory: $(pwd)"
-        echo "Scanning file: docker-image-${{ github.sha }}.tar"
-        docker run --rm \
-          -v $(pwd):/src:ro \
-          anchore/grype:latest \
-          docker-archive:/src/docker-image-${{ github.sha }}.tar \
-          --output json > grype-scan.json
-      continue-on-error: true
       
+      - name: Run Trivy vulnerability scan
+        run: |
+          docker run --rm \
+            -v /var/run/docker.sock:/var/run/docker.sock \
+            aquasec/trivy:latest \
+            image --format json \
+            ci-cd-app:${{ github.sha }} > trivy-scan.json
+        continue-on-error: true  
+
+      - name: Upload Trivy report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: trivy-report-${{ github.sha }}
+          path: trivy-scan.json
+
     
-    - name: Upload Grype report
-      uses: actions/upload-artifact@v4
-      if: always()
-      with:
-        name: grype-report-${{ github.sha }}
-        path: grype-scan.json
+      - name: Run Grype vulnerability scan
+        run: |
+          # Stelle sicher, dass wir im richtigen Verzeichnis sind und der Pfad stimmt
+          echo "Current directory: $(pwd)"
+          echo "Scanning file: docker-image-${{ github.sha }}.tar"
+          docker run --rm \
+            -v $(pwd):/src:ro \
+            anchore/grype:latest \
+            docker-archive:/src/docker-image-${{ github.sha }}.tar \
+            --output json > grype-scan.json
+        continue-on-error: true
+        
+      
+      - name: Upload Grype report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: grype-report-${{ github.sha }}
+          path: grype-scan.json
