@@ -22,6 +22,20 @@
       <version>${junit.jupiter.version}</version>
       <scope>test</scope>
     </dependency>
+
+    <!-- Vulnerable Log4j Version -->
+    <dependency>
+        <groupId>org.apache.logging.log4j</groupId>
+        <artifactId>log4j-core</artifactId>
+        <version>2.14.1</version>  <!-- CVE-2021-44228 -->
+    </dependency>
+
+    <!-- 2. Jackson (CVE-2020-8840) -->
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-databind</artifactId>
+      <version>2.9.10.1</version>
+    </dependency>
     <!-- JUnit 5 Engine (wichtig für das Ausführen der Tests) -->
     <dependency>
       <groupId>org.junit.jupiter</groupId>
