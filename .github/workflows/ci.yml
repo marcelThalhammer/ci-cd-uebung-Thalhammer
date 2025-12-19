@@ -99,10 +99,24 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
-      
+    
+    - name: Download Docker image artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: docker-image-${{ github.sha }}
+        
+    - name: Load Docker image
+      run: |
+        docker load -i docker-image-${{ github.sha }}.tar
+        docker images
+        
     - name: Run Trivy vulnerability scan
       run: |
-        docker run --rm aquasec/trivy:latest --format json ci-cd-app:${{ github.sha }} > trivy-scan.json
+        docker run --rm \
+          -v /var/run/docker.sock:/var/run/docker.sock \
+          aquasec/trivy:latest \
+          image --format json \
+          ci-cd-app:${{ github.sha }} > trivy-scan.json
         echo "Trivy scan completed"
         
     - name: Upload Trivy report
@@ -113,7 +127,7 @@ jobs:
         
     - name: Run Grype vulnerability scan
       run: |
-        docker run --rm anchore/grype:latest --output json ci-cd-app:${{ github.sha }} > grype-scan.json
+        docker run --rm anchore/grype:latest ci-cd-app:${{ github.sha }} --output json > grype-scan.json
         echo "Grype scan completed"
         
     - name: Upload Grype report
