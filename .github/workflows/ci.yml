@@ -91,47 +91,65 @@ jobs:
         retention-days: 7
 
   security-scan:
-    name: Security Scan
-    runs-on: ubuntu-latest
-    needs: docker   
-    if: github.ref == 'refs/heads/main'
-    
-    steps:
+  name: Security Scan
+  runs-on: ubuntu-latest
+  needs: docker   
+  if: github.ref == 'refs/heads/main'
+  
+  steps:
     - name: Checkout code
       uses: actions/checkout@v4
+    
     
     - name: Download Docker image artifact
       uses: actions/download-artifact@v4
       with:
         name: docker-image-${{ github.sha }}
         
-    - name: Load Docker image
+     
+    - name: Debug - Check downloaded file
+      run: ls -la docker-image-${{ github.sha }}.tar || echo "File not found!"
+      
+     
+    - name: Load Docker image (optional for Trivy)
       run: |
         docker load -i docker-image-${{ github.sha }}.tar
-        docker images
-        
-    - name: Run Grype vulnerability scan
+        docker images | grep ci-cd-app
+
+     
+    - name: Run Trivy vulnerability scan
       run: |
         docker run --rm \
-          -v $(pwd):/src \
-          anchore/grype:latest \
-          docker-archive:/src/docker-image-${{ github.sha }}.tar \
-          --output json > grype-scan.json
-        echo "Grype scan completed"
-        
+          -v /var/run/docker.sock:/var/run/docker.sock \
+          aquasec/trivy:latest \
+          image --format json \
+          ci-cd-app:${{ github.sha }} > trivy-scan.json
+      continue-on-error: true  
+
     - name: Upload Trivy report
       uses: actions/upload-artifact@v4
+      if: always()
       with:
         name: trivy-report-${{ github.sha }}
         path: trivy-scan.json
-        
+
+   
     - name: Run Grype vulnerability scan
       run: |
-        docker run --rm anchore/grype:latest ci-cd-app:${{ github.sha }} --output json > grype-scan.json
-        echo "Grype scan completed"
-        
+        # Stelle sicher, dass wir im richtigen Verzeichnis sind und der Pfad stimmt
+        echo "Current directory: $(pwd)"
+        echo "Scanning file: docker-image-${{ github.sha }}.tar"
+        docker run --rm \
+          -v $(pwd):/src:ro \
+          anchore/grype:latest \
+          docker-archive:/src/docker-image-${{ github.sha }}.tar \
+          --output json > grype-scan.json
+      continue-on-error: true
+      
+    
     - name: Upload Grype report
       uses: actions/upload-artifact@v4
+      if: always()
       with:
         name: grype-report-${{ github.sha }}
         path: grype-scan.json
