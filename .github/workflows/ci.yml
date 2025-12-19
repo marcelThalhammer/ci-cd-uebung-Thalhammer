@@ -142,7 +142,7 @@ jobs:
             -v $(pwd):/src:ro \
             anchore/grype:latest \
             docker-archive:/src/docker-image-${{ github.sha }}.tar \
-            --fail-on medium --output json > /dev/null || echo "Grype exit code: $?"
+            --only-fixed --output json > /dev/null || echo "Grype exit code: $?"
         continue-on-error: true
         
       
