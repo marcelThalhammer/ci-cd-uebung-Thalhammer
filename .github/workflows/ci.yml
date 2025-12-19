@@ -122,7 +122,7 @@ jobs:
           docker run --rm \
             -v /var/run/docker.sock:/var/run/docker.sock \
             aquasec/trivy:latest \
-            --severity HIGH,CRITICAL --exit-code 1
+            --severity LOW,MEDIUM,HIGH,CRITICAL --exit-code 1
             ci-cd-app:${{ github.sha }} > trivy-scan.json
         continue-on-error: true  
 
@@ -142,7 +142,7 @@ jobs:
             -v $(pwd):/src:ro \
             anchore/grype:latest \
             docker-archive:/src/docker-image-${{ github.sha }}.tar \
-            --fail-on high --output json > /dev/null || echo "Grype exit code: $?"
+            --fail-on medium --output json > /dev/null || echo "Grype exit code: $?"
         continue-on-error: true
         
       
