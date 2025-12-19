@@ -122,7 +122,7 @@ jobs:
           docker run --rm \
             -v /var/run/docker.sock:/var/run/docker.sock \
             aquasec/trivy:latest \
-            image --format json \
+            --severity HIGH,CRITICAL --exit-code 1
             ci-cd-app:${{ github.sha }} > trivy-scan.json
         continue-on-error: true  
 
@@ -136,14 +136,13 @@ jobs:
     
       - name: Run Grype vulnerability scan
         run: |
-          # Stelle sicher, dass wir im richtigen Verzeichnis sind und der Pfad stimmt
           echo "Current directory: $(pwd)"
           echo "Scanning file: docker-image-${{ github.sha }}.tar"
           docker run --rm \
             -v $(pwd):/src:ro \
             anchore/grype:latest \
             docker-archive:/src/docker-image-${{ github.sha }}.tar \
-            --output json > grype-scan.json
+            --fail-on high --output json > /dev/null || echo "Grype exit code: $?"
         continue-on-error: true
         
       
